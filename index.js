@@ -1,7 +1,7 @@
 var SHEET_NAME = 'シート2' // 出力するシート名
 var URL_GET_SHEET_ID = '1wI4ZkfSsmcHkINtEP3x2iNRbr8pnsvetVbmedECkjOg' // リサーチ者を参照するシートのID
-var RC_ROW = 4;     // 作成フォームのレコード開始行
-var RC_COL = 2;      // 作成フォームのレコード開始列
+var RC_ROW = 2;     // 作成フォームのレコード開始行
+var RC_COL = 1;      // 作成フォームのレコード開始列
 
 // モーダルを開く
 function showModal() {
@@ -13,7 +13,7 @@ function showModal() {
   const output = HtmlService.createTemplateFromFile('form');
   const data = spreadsheet.getSheetByName(SHEET_NAME);
 
-  const projectsLastRow = data.getRange(1, 1).getNextDataCell(SpreadsheetApp.Direction.DOWN).getRow();
+  const projectsLastRow = data.getRange(1, 1).getNextDataCell(spreadsheetApp.Direction.DOWN).getRow();
   output.projects = data.getRange(2, 1, projectsLastRow - 1).getValues();
 
   const html = output.evaluate();
@@ -42,32 +42,50 @@ function sendForm(formObject) {
   console.log('lastCol')
   console.log(lastCol)
 
+  // 仕入れ先列全取得
+  const suppliers = urlGetSheet.getSheetByName("出品 年月").getRange(2,5,5999,1).getValues(); 
+
   // ebayURL列全取得
-  const ebayURLs = urlGetSheet.getSheetByName("出品 年月").getRange(2,5,5999,1).getValues();
+  const ebayURLs = urlGetSheet.getSheetByName("出品 年月").getRange(2,12,5999,1).getValues();
+
 
 
   // 二次元配列を一次元配列に変換
+
+  const formattedSuppliers = suppliers.reduce(function (acc, cur, i) {
+    return acc.concat(cur);
+  });
+
   const formattedEbayURLs = ebayURLs.reduce(function (acc, cur, i) {
     return acc.concat(cur);
   });
-  
+
   //在庫切れ
-  const soldOuts = []
-  console.log(values)
+  var soldOuts = []
 
   // 2次元配列に整形
   var addValues = []
+  
   // １行目は項目名なのでsliceで排除
-
   values.slice(1).map(function (value) {
-    console.log(value[1])
+    // 在庫状況が空だったら売り切れ判定
     const isSoldOut = value[1] === ''
     if(isSoldOut){
-      console.log('soldout')
+      // 売り切れだったら配列にurlを追加
+      soldOuts.push(value[2])
     }
+  })
+
+  soldOuts.map(function(soldOut) {
+    // 仕入れ先と同じ行のitemNumberを取得する
+    const urlRow = formattedSuppliers.indexOf(soldOut)
+    const itemNumber =  formattedEbayURLs[urlRow].replace('https://www.ebay.com/itm/', '')
+
+    // Action(Revise = 変更), itemNumber, qty
+    addValues.push(['Revise', itemNumber, 0])
   })
   
   // 既存レコードをクリアし、CSVのレコードを貼り付け
   // clearRecords(RC_ROW, RC_COL, sheet);
-  // sheet.getRange(RC_ROW - 1, RC_COL, addValues.length, addValues[0].length).setValues(addValues.reverse());
+  sheet.getRange(RC_ROW, RC_COL, addValues.length, addValues[0].length).setValues(addValues);
 }
