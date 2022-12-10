@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <script>
+      // Prevent forms from submitting.
+      function preventFormSubmit() {
+        var forms = document.querySelectorAll('form');
+        for (var i = 0; i < forms.length; i++) {
+          forms[i].addEventListener('submit', function(event) {
+            event.preventDefault();
+          });
+        }
+      }
+      window.addEventListener('load', preventFormSubmit);
+
+      function handleSubmit(formObject){
+        google.script.run
+          .withSuccessHandler(google.script.host.close)
+          .withFailureHandler(function () {
+            alert('アップロードに失敗しました');
+            google.script.host.close();
+        })
+          .sendForm(formObject);
+      }
+    </script>
+  </head>
+  <body>
+     <form id="myForm" onsubmit="handleSubmit(this)" enctype="multipart/form-data">
+      <p>
+        ファイル：<input id="file" type="file" name="myFile" />
+      </p>
+      
+      <button type="submit" name="send">
+        ファイルをアップロードする
+      </button>
+    </form>
+  </body>
+</html>
