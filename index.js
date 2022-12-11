@@ -1,4 +1,4 @@
-var SHEET_NAME = 'シート2' // 出力するシート名
+var SHEET_NAME = 'シート2' // フォームを出力するシート名
 var URL_GET_SHEET_ID = '1wI4ZkfSsmcHkINtEP3x2iNRbr8pnsvetVbmedECkjOg' // リサーチ者を参照するシートのID
 var RC_ROW = 2;     // 作成フォームのレコード開始行
 var RC_COL = 1;      // 作成フォームのレコード開始列
@@ -13,7 +13,7 @@ function showModal() {
   const output = HtmlService.createTemplateFromFile('form');
   const data = spreadsheet.getSheetByName(SHEET_NAME);
 
-  const projectsLastRow = data.getRange(1, 1).getNextDataCell(spreadsheetApp.Direction.DOWN).getRow();
+  const projectsLastRow = data.getRange(1, 1).getNextDataCell(SpreadsheetApp.Direction.DOWN).getRow();
   output.projects = data.getRange(2, 1, projectsLastRow - 1).getValues();
 
   const html = output.evaluate();
@@ -37,10 +37,6 @@ function sendForm(formObject) {
   // 仕入れ先を取得するシートを取得
   const urlGetSheet = SpreadsheetApp.openById(URL_GET_SHEET_ID)
 
-  //データがある最終列を取得（上手くいってない）
-  const lastCol = urlGetSheet.getLastColumn();
-  console.log('lastCol')
-  console.log(lastCol)
 
   // 仕入れ先列全取得
   const suppliers = urlGetSheet.getSheetByName("出品 年月").getRange(2,5,5999,1).getValues(); 
@@ -65,7 +61,7 @@ function sendForm(formObject) {
 
   // 2次元配列に整形
   var addValues = []
-  
+
   // １行目は項目名なのでsliceで排除
   values.slice(1).map(function (value) {
     // 在庫状況が空だったら売り切れ判定
@@ -83,6 +79,8 @@ function sendForm(formObject) {
 
     // Action(Revise = 変更), itemNumber, qty
     addValues.push(['Revise', itemNumber, 0])
+    //                                              ヘッダーの2行分ずらす
+    urlGetSheet.getSheetByName("出品 年月").getRange(urlRow + 2, 5).setValue('');
   })
   
   // 既存レコードをクリアし、CSVのレコードを貼り付け
