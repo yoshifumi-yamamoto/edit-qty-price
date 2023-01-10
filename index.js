@@ -61,11 +61,16 @@ function sendForm(formObject) {
 
   // 2次元配列に整形
   var addValues = []
+  // 売り切れ判定
+  const soldOutsMsgs = ['', '売り切れました']
 
   // １行目は項目名なのでsliceで排除
   values.slice(1).map(function (value) {
+    console.log(value)
+    console.log('value')
+    console.log('https://jp.mercari.com/item/m99925351601')
     // 在庫状況が空だったら売り切れ判定
-    const isSoldOut = value[1] === ''
+    const isSoldOut =  soldOutsMsgs.indexOf(value[1]) !== -1
     if(isSoldOut){
       // 売り切れだったら配列にurlを追加
       soldOuts.push(value[2])
@@ -75,11 +80,12 @@ function sendForm(formObject) {
   soldOuts.map(function(soldOut) {
     // 仕入れ先と同じ行のitemNumberを取得する
     const urlRow = formattedSuppliers.indexOf(soldOut)
-    const itemNumber =  formattedEbayURLs[urlRow].replace('https://www.ebay.com/itm/', '')
+    console.log(soldOut)
+    const itemNumber =  formattedEbayURLs[urlRow] ? formattedEbayURLs[urlRow].replace('https://www.ebay.com/itm/', '') : formattedSuppliers[urlRow]
 
     // Action(Revise = 変更), itemNumber, qty
     addValues.push(['Revise', itemNumber, 0])
-    //                                              ヘッダーの2行分ずらす
+    //   仕入れ先url 削除                                  ヘッダーの2行分ずらす
     urlGetSheet.getSheetByName("出品 年月").getRange(urlRow + 2, 5).setValue('');
   })
   
