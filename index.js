@@ -39,10 +39,10 @@ function sendForm(formObject) {
 
 
   // 仕入れ先列全取得
-  const suppliers = urlGetSheet.getSheetByName("出品 年月").getRange(2,5,5999,1).getValues(); 
+  const suppliers = urlGetSheet.getSheetByName("出品 年月").getRange(2,5,9999,1).getValues(); 
 
   // ebayURL列全取得
-  const ebayURLs = urlGetSheet.getSheetByName("出品 年月").getRange(2,12,5999,1).getValues();
+  const ebayURLs = urlGetSheet.getSheetByName("出品 年月").getRange(2,12,9999,1).getValues();
 
 
 
