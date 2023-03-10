@@ -32,7 +32,7 @@ function input () {
   // 仕入れ先を取得するシートを取得
   const urlGetSheet = SpreadsheetApp.openById(URL_GET_SHEET_ID).getSheetByName(INPUT_SHEET_NAME)
   // 仕入れ先を取得
-  const suppliers = urlGetSheet.getRange(4,5,5999,1).getValues();
+  const suppliers = urlGetSheet.getRange(4,5,9999,1).getValues();
   const formattedSuppliers = suppliers.reduce(function (acc, cur, i) {
     return acc.concat(cur);
   });
@@ -41,4 +41,30 @@ function input () {
   const exclusions = formattedSuppliers.filter(function(sup){return !!sup}).sort()
   return exclusions
 
+}
+
+function copyToMercariSheet() {
+
+  // Source spreadsheet and range
+  const sourceSheet = SpreadsheetApp.openById("1wI4ZkfSsmcHkINtEP3x2iNRbr8pnsvetVbmedECkjOg").getSheetByName("出品 年月");
+  const sourceRange = sourceSheet.getRange("E6071:E");
+
+  // Get all values in column E from row 6071 to the end
+  const sourceValues = sourceRange.getValues();
+
+  // Target spreadsheet and range
+  const targetSheet = SpreadsheetApp.openById("1o4jOyzdhCmGJo6YqSUMlm9_ODeqiKrUwxSHVKQ_SnGc").getSheetByName("メルカリ");
+  const targetRange = targetSheet.getRange("A1:A");
+
+  // Clear any previous data in target range
+  targetRange.clearContent();
+
+  // Loop through the source values and write any cell that contains the word "mercari" to the target range
+  const targetRow = 1;
+  for (var i = 0; i < sourceValues.length; i++) {
+    if (sourceValues[i][0].indexOf("mercari") !== -1) {
+      targetSheet.getRange(targetRow, 1).setValue(sourceValues[i][0]);
+      targetRow++;
+    }
+  }
 }
