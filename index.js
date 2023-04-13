@@ -1,4 +1,5 @@
-var SHEET_NAME = 'シート2' // フォームを出力するシート名
+var SHEET_NAME = 'シート1' // フォームを出力するシート名
+var SETTING_SHEET_NAME = '設定' // 設定シート名
 var URL_GET_SHEET_ID = '1wI4ZkfSsmcHkINtEP3x2iNRbr8pnsvetVbmedECkjOg' // リサーチ者を参照するシートのID
 var RC_ROW = 2;     // 作成フォームのレコード開始行
 var RC_COL = 1;      // 作成フォームのレコード開始列
@@ -39,10 +40,10 @@ function sendForm(formObject) {
 
 
   // 仕入れ先列全取得
-  const suppliers = urlGetSheet.getSheetByName("出品 年月").getRange(2,5,9999,1).getValues(); 
+  const suppliers = urlGetSheet.getSheetByName("出品 年月").getRange(2,5,20000,1).getValues(); 
 
   // ebayURL列全取得
-  const ebayURLs = urlGetSheet.getSheetByName("出品 年月").getRange(2,12,9999,1).getValues();
+  const ebayURLs = urlGetSheet.getSheetByName("出品 年月").getRange(2,12,20000,1).getValues();
 
 
 
@@ -77,6 +78,9 @@ function sendForm(formObject) {
     }
   })
 
+  const Settings = ss.getSheetByName(SETTING_SHEET_NAME)
+  const deleteFlg = Settings.getRange('A2').getValue() === "ON"
+
   soldOuts.map(function(soldOut) {
     // 仕入れ先と同じ行のitemNumberを取得する
     const urlRow = formattedSuppliers.indexOf(soldOut)
@@ -85,8 +89,11 @@ function sendForm(formObject) {
 
     // Action(Revise = 変更), itemNumber, qty
     addValues.push(['Revise', itemNumber, 0])
-    //   仕入れ先url 削除                                  ヘッダーの2行分ずらす
-    urlGetSheet.getSheetByName("出品 年月").getRange(urlRow + 2, 5).setValue('');
+    if(deleteFlg){
+      //   仕入れ先url 削除                                  ヘッダーの2行分ずらす
+      urlGetSheet.getSheetByName("出品 年月").getRange(urlRow + 2, 5).setValue('');
+    }
+    
   })
   
   // 既存レコードをクリアし、CSVのレコードを貼り付け
