@@ -91,7 +91,12 @@ function sendForm(formObject) {
       suppliers[itemRow][0] = ''
     }else{
       // 最新の仕入価格を配列に上書き
-      supplierPricies[itemRow][0] = latestPrice
+      // 商品が見つからない場合のエラー回避
+      if(supplierPricies[itemRow]){
+        if(supplierPricies[itemRow][0] !== 0.0){
+          supplierPricies[itemRow][0] = latestPrice
+        }
+      }
       addValues.push(['Revise', itemNumber, 1])
     }
   })
