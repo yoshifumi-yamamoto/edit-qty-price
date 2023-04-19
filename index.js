@@ -88,7 +88,9 @@ function sendForm(formObject) {
       // Action(Revise = 変更), itemNumber, qty
       addValues.push(['Revise', itemNumber, 0])
       // 仕入れ先を配列から削除
-      suppliers[itemRow][0] = ''
+      if(itemRow > -1){
+        suppliers[itemRow][0] = ''
+      }
     }else{
       // 最新の仕入価格を配列に上書き
       // 商品が見つからない場合のエラー回避
