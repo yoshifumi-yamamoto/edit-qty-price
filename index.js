@@ -109,10 +109,11 @@ function sendForm(formObject) {
     // 仕入れ先url更新
     urlGetSheet.getSheetByName("出品 年月").getRange(2,5,20000,1).setValues(suppliers);
   }
-  
+  // 書き込みを最終行以降から開始
+  const startRow = sheet.getLastRow()+1
   // 既存レコードをクリアし、CSVのレコードを貼り付け
   // clearRecords(RC_ROW, RC_COL, sheet);
-  sheet.getRange(RC_ROW, RC_COL, addValues.length, addValues[0].length).setValues(addValues);
+  sheet.getRange(startRow, RC_COL, addValues.length, addValues[0].length).setValues(addValues);
 }
 
 function clearSheet1() {
