@@ -4,33 +4,35 @@ var URL_GET_SHEET_ID = '1wI4ZkfSsmcHkINtEP3x2iNRbr8pnsvetVbmedECkjOg' // リサ�
 var RC_ROW = 2;     // 作成フォームのレコード開始行
 var RC_COL = 1;      // 作成フォームのレコード開始列
 
-// モーダルを開く
-function showModal() {
+// ドライブ内にあるcsvデータ全取得
+function extractDataFromCSVFiles() {
+  var folderId = "1yOwqEq08i8ydu5nr7s0T3yN1FdxiBLvV";  // 抽出したいCSVファイルが含まれるフォルダのIDを指定します
+  var folder = DriveApp.getFolderById(folderId);
+  var files = folder.getFilesByType(MimeType.CSV);
+  var data = [];  // 抽出したデータを格納するための配列
 
-  // 開いているスプレッドシートを取得
-  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  while (files.hasNext()) {
+    var file = files.next();
+    var csvData = Utilities.parseCsv(file.getBlob().getDataAsString(), ',');
+    
+    // ヘッダーを除去してCSVファイルのデータを配列に追加
+    for (var i = 1; i < csvData.length; i++) {
+      data.push(csvData[i]);
+    }
+  }
+  
+  // 抽出したデータを使って必要な処理を行う
+  // 例えば、データの表示や処理結果の返却など
 
-  // HTMLファイルを取得
-  const output = HtmlService.createTemplateFromFile('form');
-  const data = spreadsheet.getSheetByName(SHEET_NAME);
-
-  const projectsLastRow = data.getRange(1, 1).getNextDataCell(SpreadsheetApp.Direction.DOWN).getRow();
-  output.projects = data.getRange(2, 1, projectsLastRow - 1).getValues();
-
-  const html = output.evaluate();
-  spreadsheet.show(html);
+  // 抽出したデータを返す場合
+  return data;
 }
 
-// アップロードボタン
-function sendForm(formObject) {
-  
-  // フォームから受け取ったcsvデータ
-  const blob = formObject.myFile;
-  const csvText = blob.getDataAsString();
-  const values = Utilities.parseCsv(csvText);
 
-  // アップロードするファイル名を取得
-  const fileName = blob.getName()
+// アップロードボタン
+function sendForm() {
+
+  const values = extractDataFromCSVFiles()
 
   const ss = SpreadsheetApp.getActive();
   const sheet = ss.getSheetByName('シート1');
@@ -65,14 +67,13 @@ function sendForm(formObject) {
   // 2次元配列に整形
   var addValues = []
   // 売り切れ判定
-  const soldOutsMsgs = ['', '売り切れました']
+  const soldOutsMsgs = ['', '売り切れました', 'ただいま売り切れ中です']
   // 設定シート
   const Settings = ss.getSheetByName(SETTING_SHEET_NAME)
   // URLを削除するかどうか
   const deleteFlg = Settings.getRange('A2').getValue() === "ON"
 
-  // １行目は項目名なのでsliceで排除
-  values.slice(1).map(function (value) {
+  values.map(function (value) {
     // 在庫状況が空だったら売り切れ判定
     const buyNowBtnMsg = value[1]
     const isSoldOut =  soldOutsMsgs.indexOf(buyNowBtnMsg) !== -1
