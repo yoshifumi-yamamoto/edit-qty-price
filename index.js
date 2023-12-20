@@ -1,12 +1,12 @@
 var SHEET_NAME = 'シート1' // フォームを出力するシート名
 var SETTING_SHEET_NAME = '設定' // 設定シート名
-var URL_GET_SHEET_ID = '1wI4ZkfSsmcHkINtEP3x2iNRbr8pnsvetVbmedECkjOg' // リサーチ者を参照するシートのID
+var URL_GET_SHEET_ID = '1SZ2lXSoSunmNWmiJqPN3vlvPVCOdUgDmWLkP-gyj9uo' // 仕入れ先を参照するシートのID
 var RC_ROW = 2;     // 作成フォームのレコード開始行
 var RC_COL = 1;      // 作成フォームのレコード開始列
 
 // ドライブ内にあるcsvデータ全取得
 function extractDataFromCSVFiles() {
-  var folderId = "1yOwqEq08i8ydu5nr7s0T3yN1FdxiBLvV";  // 抽出したいCSVファイルが含まれるフォルダのIDを指定します
+  var folderId = "1K92RsdR2OT3wh6nGt_EXKv0zs-OjsX4U";  // 抽出したいCSVファイルが含まれるフォルダのIDを指定します
   var folder = DriveApp.getFolderById(folderId);
   var files = folder.getFilesByType(MimeType.CSV);
   var data = [];  // 抽出したデータを格納するための配列
@@ -42,13 +42,13 @@ function sendForm() {
 
 
   // 仕入れ先列全取得
-  const suppliers = urlGetSheet.getSheetByName("出品 年月").getRange(2,5,20000,1).getValues(); 
+  const suppliers = urlGetSheet.getSheetByName("出品 年月").getRange(2,5,30000,1).getValues(); 
 
   // ebayURL列全取得
-  const ebayURLs = urlGetSheet.getSheetByName("出品 年月").getRange(2,12,20000,1).getValues();
+  const ebayURLs = urlGetSheet.getSheetByName("出品 年月").getRange(2,12,30000,1).getValues();
 
   // 仕入価格列全取得
-  var supplierPricies = urlGetSheet.getSheetByName("出品 年月").getRange(2,6,20000,1).getValues();
+  var supplierPricies = urlGetSheet.getSheetByName("出品 年月").getRange(2,6,30000,1).getValues();
 
 
   // 二次元配列を一次元配列に変換
@@ -104,11 +104,11 @@ function sendForm() {
     }
   })
   // 仕入れ価格の更新
-  urlGetSheet.getSheetByName("出品 年月").getRange(2,6,20000,1).setValues(supplierPricies)
+  urlGetSheet.getSheetByName("出品 年月").getRange(2,6,30000,1).setValues(supplierPricies)
   // flagがONなら仕入れ先URLを商品管理表から削除
   if(deleteFlg){
     // 仕入れ先url更新
-    urlGetSheet.getSheetByName("出品 年月").getRange(2,5,20000,1).setValues(suppliers);
+    urlGetSheet.getSheetByName("出品 年月").getRange(2,5,30000,1).setValues(suppliers);
   }
   // 書き込みを最終行以降から開始
   const startRow = sheet.getLastRow()+1

@@ -1,6 +1,6 @@
 var INPUT_SHEET_NAME = '出品 年月' // 取得するシート名
 var OUTPUT_SHEET_NAME = '在庫管理' // 出力するシート名
-var URL_GET_SHEET_ID = '1wI4ZkfSsmcHkINtEP3x2iNRbr8pnsvetVbmedECkjOg' // リサーチ者を参照するシートのID
+var URL_GET_SHEET_ID = '1SZ2lXSoSunmNWmiJqPN3vlvPVCOdUgDmWLkP-gyj9uo' // 仕入れ先を参照するシートのID
 var ss = SpreadsheetApp.getActive(); // 現在のシートを取得
 var RC_ROW = 2;     // 作成フォームのレコード開始行
 var RC_COL = 1;      // 作成フォームのレコード開始列
@@ -32,7 +32,7 @@ function input () {
   // 仕入れ先を取得するシートを取得
   const urlGetSheet = SpreadsheetApp.openById(URL_GET_SHEET_ID).getSheetByName(INPUT_SHEET_NAME)
   // 仕入れ先を取得
-  const suppliers = urlGetSheet.getRange(4,5,20000,1).getValues();
+  const suppliers = urlGetSheet.getRange(4,5,30000,1).getValues();
   const formattedSuppliers = suppliers.reduce(function (acc, cur, i) {
     return acc.concat(cur);
   });
@@ -47,7 +47,7 @@ function copyToMercariSheet() {
 
   // Source spreadsheet and range
   const sourceSheet = SpreadsheetApp.openById("1wI4ZkfSsmcHkINtEP3x2iNRbr8pnsvetVbmedECkjOg").getSheetByName("出品 年月");
-  const sourceRange = sourceSheet.getRange("E5001:E15000");
+  const sourceRange = sourceSheet.getRange("E5001:E12000");
 
   // Get all values in column E from row 6071 to the end
   const sourceValues = sourceRange.getValues();
