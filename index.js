@@ -4,7 +4,7 @@ var URL_GET_SHEET_ID = '1SZ2lXSoSunmNWmiJqPN3vlvPVCOdUgDmWLkP-gyj9uo' // 仕入�
 var RC_ROW = 2;     // 作成フォームのレコード開始行
 var RC_COL = 1;      // 作成フォームのレコード開始列
 
-// ドライブ内にあるcsvデータ全取得
+// ドライブ内にあるcsvデータ全取得し、特定の条件で列を並べ替える
 function extractDataFromCSVFiles() {
   var folderId = "1K92RsdR2OT3wh6nGt_EXKv0zs-OjsX4U";  // 抽出したいCSVファイルが含まれるフォルダのIDを指定します
   var folder = DriveApp.getFolderById(folderId);
@@ -13,16 +13,31 @@ function extractDataFromCSVFiles() {
 
   while (files.hasNext()) {
     var file = files.next();
+
+    // ファイル名に「メルカリ」が含まれているかチェック
+    var isMercariFile = file.getName().indexOf('メルカリ') !== -1;
     var csvData = Utilities.parseCsv(file.getBlob().getDataAsString(), ',');
-    
-    // ヘッダーを除去してCSVファイルのデータを配列に追加
+
+    // CSVデータのヘッダー行から各列のインデックスを取得
+    var headers = csvData[0];
+    var productIndex = headers.indexOf('商品名');
+    var stockIndex = headers.indexOf('在庫');
+    var keywordIndex = headers.indexOf('店铺URL');
+    var priceIndex = headers.indexOf('価格');
+
+    // ヘッダーを除去してCSVファイルのデータを並べ替えて配列に追加
     for (var i = 1; i < csvData.length; i++) {
-      data.push(csvData[i]);
+      var row = csvData[i];
+      var reorderedRow = isMercariFile ? [
+        row[productIndex], // 商品名
+        row[stockIndex],   // 在庫
+        row[keywordIndex], // Keyword
+        row[priceIndex]    // 価格
+      ] : row;
+
+      data.push(reorderedRow);
     }
   }
-  
-  // 抽出したデータを使って必要な処理を行う
-  // 例えば、データの表示や処理結果の返却など
 
   // 抽出したデータを返す場合
   return data;
@@ -79,7 +94,7 @@ function sendForm() {
     const isSoldOut =  soldOutsMsgs.indexOf(buyNowBtnMsg) !== -1
     // 仕入れ先URL
     const supplierURL = value[2]
-
+    // console.log("仕入れ先URL", supplierURL)
     // 仕入れ先と同じ行のitemNumberを取得する
     const itemRow = formattedSuppliers.indexOf(supplierURL)
     const itemNumber =  formattedEbayURLs[itemRow] ? formattedEbayURLs[itemRow].replace('https://www.ebay.com/itm/', '') : formattedSuppliers[itemRow]
